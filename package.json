@@ -8,11 +8,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "clean": "rm -rf ./src/artifacts ./target",
-    "codegen": "${AZTEC_CLI:-aztec-cli} codegen target --outdir src/artifacts --ts",
-    "compile": "${AZTEC_NARGO:-aztec-nargo} compile",
-    "test": "NODE_NO_WARNINGS=1 node --experimental-vm-modules $(yarn bin jest) --no-cache --runInBand --config jest.integration.config.json",
-    "update": "aztec-cli update --contract . && ./.github/scripts/update_contract.sh $(grep -oP 'tag\\s*=\\s*\"\\K[^\"]+' \"Nargo.toml\" | head -1)"
+    "clean": "rm -rf ./contracts/artifacts",
+    "codegen-ts": "./scripts/codegen_ts.sh",
+    "codegen-nr": "./scripts/codegen_nr.sh",
+    "compile": "./scripts/compile.sh",
+    "test": "NODE_NO_WARNINGS=1 node --experimental-vm-modules $(yarn bin jest) --no-cache --runInBand --config jest.integration.config.json"
   },
   "dependencies": {
     "@aztec/aztec.js": "0.21.0"

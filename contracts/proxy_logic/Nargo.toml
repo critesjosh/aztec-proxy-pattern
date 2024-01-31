@@ -1,0 +1,10 @@
+[package]
+name = "proxy_logic"
+type = "contract"
+authors = [ "" ]
+compiler_version = ">=0.18.0"
+
+[dependencies]
+aztec = { git = "https://github.com/AztecProtocol/aztec-packages/", tag = "aztec-packages-v0.21.0", directory = "yarn-project/aztec-nr/aztec" }
+field_note = { git = "https://github.com/AztecProtocol/aztec-packages/", tag = "aztec-packages-v0.21.0", directory = "yarn-project/aztec-nr/field-note"}
+safe_math = { git = "https://github.com/AztecProtocol/aztec-packages/", tag = "aztec-packages-v0.21.0", directory = "yarn-project/aztec-nr/safe-math" }

@@ -1,4 +1,4 @@
-import { EasyPrivateVotingContractArtifact, EasyPrivateVotingContract } from "../artifacts/EasyPrivateVoting.js"
+import { SlowTreeContractArtifact, SlowTreeContract } from "../contracts/artifacts/SlowTree.js"
 import { ContractDeployer, Fr, PXE, waitForPXE, TxStatus, createPXEClient, getContractDeploymentInfo, AccountWalletWithPrivateKey } from "@aztec/aztec.js";
 import { getInitialTestAccountsWallets } from "@aztec/accounts/testing"
 
@@ -21,15 +21,15 @@ describe("Voting", () => {
         sender = wallets[0]
     }, 40000)
 
-    it("Deploys the contract", async () => {
+    it("Deploys the Slow tree contract", async () => {
         const salt = Fr.random();
         const publicKey = sender.getCompleteAddress().publicKey
-        const VotingContractArtifact = EasyPrivateVotingContractArtifact
-        const deployArgs = sender.getCompleteAddress().address
+        // const VotingContractArtifact = SlowTreeContractArtifact
+        // const deployArgs = sender.getCompleteAddress().address
 
-        const deploymentData = getContractDeploymentInfo(VotingContractArtifact, [deployArgs], salt, publicKey);
-        const deployer = new ContractDeployer(VotingContractArtifact, pxe, publicKey);
-        const tx = deployer.deploy(deployArgs).send({ contractAddressSalt: salt })
+        const deploymentData = getContractDeploymentInfo(SlowTreeContractArtifact, [], salt, publicKey);
+        const deployer = new ContractDeployer(SlowTreeContractArtifact, pxe, publicKey);
+        const tx = deployer.deploy().send({ contractAddressSalt: salt })
         const receipt = await tx.getReceipt();
 
         expect(receipt).toEqual(
@@ -50,13 +50,13 @@ describe("Voting", () => {
         );
     })
 
-    it("It casts a vote", async () => {
-        const candidate = new Fr(1)
+    // it("It casts a vote", async () => {
+    //     const candidate = new Fr(1)
 
-        const contract = await EasyPrivateVotingContract.deploy(wallets[0], sender.getCompleteAddress().address).send().deployed();
-        const tx = await contract.methods.cast_vote(candidate).send().wait();
-        let count = await contract.methods.get_vote(candidate).view();
-        expect(count).toBe(1n);
-    })
+    //     const contract = await EasyPrivateVotingContract.deploy(wallets[0], sender.getCompleteAddress().address).send().deployed();
+    //     const tx = await contract.methods.cast_vote(candidate).send().wait();
+    //     let count = await contract.methods.get_vote(candidate).view();
+    //     expect(count).toBe(1n);
+    // })
 
 });
