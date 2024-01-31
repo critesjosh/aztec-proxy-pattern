@@ -55,10 +55,9 @@ contract Proxy {
         storage.slow_update.initialize(&mut slow_note, false);
 
         context.call_public_function(
-            // we cannot update public state directly from private function but we can call public function (which queues it)
-            context.this_address(),// contract address whose method we want to call
-            FunctionSelector::from_signature("_initialize((Field))"), // function selector
-            [admin.to_field(), slow_updates_contract.to_field()] // parameters
+            context.this_address(),
+            FunctionSelector::from_signature("_initialize((Field),(Field))"),
+            [admin.to_field(), slow_updates_contract.to_field()]
         );
     }
 
@@ -71,17 +70,21 @@ contract Proxy {
     }
 
     #[aztec(private)]
-    fn call_counter(old: Field, new: Field) {
+    fn call_counter(old_count: Field, new_count: Field) {
         let slow = SlowMap::at(AztecAddress::from_field(storage.slow_update.get_note().value));
         let logic_contract = LogicContractPrivateContextInterface::at(AztecAddress::from_field(slow.read_at(&mut context, 0)));
-        let _ = logic_contract.increment_counter(&mut context, old, new);
+        let _ = logic_contract.increment_counter(&mut context, old_count, new_count);
     }
 
     #[aztec(public)]
-    fn call_public_counter(old: u120, new: u120) {
+    fn call_public_counter(old_count: u120, new_count: u120) {
         let slow = SlowMap::at(AztecAddress::from_field(storage.slow_update.get_note().value));
         let logic_contract = LogicContractPublicContextInterface::at(AztecAddress::from_field(slow.read_at_pub(context, 0)));
-        let _ = logic_contract.increment_public_counter(context, old, new);
+        let _ = logic_contract.increment_public_counter(context, old_count, new_count);
+    }
+
+    unconstrained fn get_slow_update() -> pub Field {
+        storage.slow_update.get_note().value
     }
 
     unconstrained fn compute_note_hash_and_nullifier(

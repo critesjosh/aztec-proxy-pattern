@@ -3,6 +3,7 @@ mod StorageContract;
 contract LogicContract {
     use dep::aztec::{
         protocol_types::{
+            abis::function_selector::FunctionSelector,
             address::AztecAddress,
         },
         context::{PrivateContext, Context},
@@ -23,14 +24,24 @@ contract LogicContract {
     }
 
     impl Storage {
-	fn init(context: Context) -> Self {
-	    Storage {
-            proxy_storage: PublicState::new(context, 1, AddressSerializationMethods),
-	    }}
+        fn init(context: Context) -> Self {
+            Storage {
+                proxy_storage: PublicState::new(context, 1, AddressSerializationMethods),
+            }}
 	}
+
     #[aztec(private)] 
     fn constructor(storage_contract: AztecAddress) {
         assert(!storage_contract.is_zero(), "invalid storage contract address");
+        context.call_public_function(
+            context.this_address(),
+            FunctionSelector::from_signature("_initialize((Field))"),
+            [storage_contract.to_field()]
+        );
+    }
+
+    #[aztec(public)] 
+    internal fn _initialize(storage_contract: AztecAddress) {
         storage.proxy_storage.write(storage_contract);
     }
 

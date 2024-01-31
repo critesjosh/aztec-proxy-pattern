@@ -82,7 +82,16 @@ export class ProxyContract extends ContractBase {
   /** Type-safe wrappers for the public methods exposed by the contract. */
   public methods!: {
     
+    /** get_slow_update() */
+    get_slow_update: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
+    /** call_counter(old_count: field, new_count: field) */
+    call_counter: ((old_count: FieldLike, new_count: FieldLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
     /** compute_note_hash_and_nullifier(contract_address: struct, nonce: field, storage_slot: field, serialized_note: array) */
     compute_note_hash_and_nullifier: ((contract_address: AztecAddressLike, nonce: FieldLike, storage_slot: FieldLike, serialized_note: FieldLike[]) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
+    /** call_public_counter(old_count: integer, new_count: integer) */
+    call_public_counter: ((old_count: (bigint | number), new_count: (bigint | number)) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
   };
 }

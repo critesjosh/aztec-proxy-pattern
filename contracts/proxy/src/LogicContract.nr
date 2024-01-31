@@ -38,18 +38,6 @@ impl LogicContractPrivateContextInterface {
   }
   
 
-  pub fn set_address(
-    self,
-    context: &mut PrivateContext,
-    address: AddressSetAddressStruct
-  ) {
-    let mut serialized_args = [0; 1];
-    serialized_args[0] = address.inner;
-
-    context.call_public_function(self.address, FunctionSelector::from_field(0x49e025c2), serialized_args)
-  }
-  
-
   pub fn increment_public_counter(
     self,
     context: &mut PrivateContext,
@@ -61,6 +49,18 @@ impl LogicContractPrivateContextInterface {
     serialized_args[1] = new_count as Field;
 
     context.call_public_function(self.address, FunctionSelector::from_field(0x5ee7304c), serialized_args)
+  }
+  
+
+  pub fn set_address(
+    self,
+    context: &mut PrivateContext,
+    address: AddressSetAddressStruct
+  ) {
+    let mut serialized_args = [0; 1];
+    serialized_args[0] = address.inner;
+
+    context.call_public_function(self.address, FunctionSelector::from_field(0x49e025c2), serialized_args)
   }
   
 }
@@ -77,18 +77,6 @@ impl LogicContractPublicContextInterface {
       }
   }
   
-  pub fn set_address(
-    self,
-    context: PublicContext,
-    address: AddressSetAddressStruct
-  ) -> [Field; RETURN_VALUES_LENGTH] {
-    let mut serialized_args = [0; 1];
-    serialized_args[0] = address.inner;
-
-    context.call_public_function(self.address, FunctionSelector::from_field(0x49e025c2), serialized_args)
-  }
-  
-
   pub fn increment_public_counter(
     self,
     context: PublicContext,
@@ -100,6 +88,18 @@ impl LogicContractPublicContextInterface {
     serialized_args[1] = new_count as Field;
 
     context.call_public_function(self.address, FunctionSelector::from_field(0x5ee7304c), serialized_args)
+  }
+  
+
+  pub fn set_address(
+    self,
+    context: PublicContext,
+    address: AddressSetAddressStruct
+  ) -> [Field; RETURN_VALUES_LENGTH] {
+    let mut serialized_args = [0; 1];
+    serialized_args[0] = address.inner;
+
+    context.call_public_function(self.address, FunctionSelector::from_field(0x49e025c2), serialized_args)
   }
   
 }

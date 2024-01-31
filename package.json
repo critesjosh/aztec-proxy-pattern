@@ -11,6 +11,7 @@
     "clean": "rm -rf ./contracts/artifacts",
     "codegen-ts": "./scripts/codegen_ts.sh",
     "codegen-nr": "./scripts/codegen_nr.sh",
+    "build:contracts": "yarn clean && yarn compile && yarn codegen-nr && yarn codegen-ts",
     "compile": "./scripts/compile.sh",
     "test": "NODE_NO_WARNINGS=1 node --experimental-vm-modules $(yarn bin jest) --no-cache --runInBand --config jest.integration.config.json"
   },

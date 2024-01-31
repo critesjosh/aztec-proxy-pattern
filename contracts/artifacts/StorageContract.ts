@@ -82,14 +82,11 @@ export class StorageContractContract extends ContractBase {
   /** Type-safe wrappers for the public methods exposed by the contract. */
   public methods!: {
     
-    /** compute_note_hash_and_nullifier(contract_address: struct, nonce: field, storage_slot: field, serialized_note: array) */
-    compute_note_hash_and_nullifier: ((contract_address: AztecAddressLike, nonce: FieldLike, storage_slot: FieldLike, serialized_note: FieldLike[]) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+    /** get_public_counter() */
+    get_public_counter: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
 
     /** get_counter() */
     get_counter: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
-
-    /** get_public_counter() */
-    get_public_counter: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
 
     /** update_counter(old_count: field, new_count: field) */
     update_counter: ((old_count: FieldLike, new_count: FieldLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
@@ -102,5 +99,8 @@ export class StorageContractContract extends ContractBase {
 
     /** update_address(address: struct, value: boolean) */
     update_address: ((address: AztecAddressLike, value: boolean) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
+    /** compute_note_hash_and_nullifier(contract_address: struct, nonce: field, storage_slot: field, serialized_note: array) */
+    compute_note_hash_and_nullifier: ((contract_address: AztecAddressLike, nonce: FieldLike, storage_slot: FieldLike, serialized_note: FieldLike[]) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
   };
 }

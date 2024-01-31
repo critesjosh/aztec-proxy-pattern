@@ -21,5 +21,5 @@
     "skipLibCheck": true,
     "jsx": "react-jsx"
   },
-  "include": ["contracts", "src/**/*.json", "contracts/artifacts", "test"]
+  "include": ["contracts", "contracts/**/*.json", "contracts/artifacts", "test"]
 }

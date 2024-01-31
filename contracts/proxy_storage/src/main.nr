@@ -51,11 +51,14 @@ contract StorageContract {
                 2,
                 SafeU120SerializationMethods,
             ),
+            // can only be updated by the deployer as written
             counter: Singleton::new(context, 3, FieldNoteMethods),
 	    } }
 	}
     #[aztec(private)] 
-    fn constructor() {}
+    fn constructor() {
+        storage.counter.initialize(&mut FieldNote::new(0), false);
+    }
 
     #[aztec(private)]
     fn update_counter(old_count: Field, new_count: Field) {
@@ -77,7 +80,7 @@ contract StorageContract {
     }
 
     unconstrained fn get_counter() -> pub Field {
-        storage.counter.get_note(true).value
+        storage.counter.view_note().value
     }
 
     unconstrained fn get_public_counter() -> pub u120 {
@@ -92,7 +95,7 @@ contract StorageContract {
         contract_address: AztecAddress,
         nonce: Field,
         storage_slot: Field,
-        serialized_note: [Field; 0]
+        serialized_note: [Field; FIELD_NOTE_LEN]
     ) -> pub [Field; 4] {
         let note_header = NoteHeader::new(contract_address, nonce, storage_slot);
         note_utils::compute_note_hash_and_nullifier(FieldNoteMethods, note_header, serialized_note)
