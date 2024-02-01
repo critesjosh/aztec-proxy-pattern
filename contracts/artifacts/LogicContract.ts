@@ -58,14 +58,14 @@ export class LogicContractContract extends ContractBase {
   /**
    * Creates a tx to deploy a new instance of this contract.
    */
-  public static deploy(wallet: Wallet, storage_contract: AztecAddressLike) {
+  public static deploy(wallet: Wallet, ) {
     return new DeployMethod<LogicContractContract>(Point.ZERO, wallet, LogicContractContractArtifact, LogicContractContract.at, Array.from(arguments).slice(1));
   }
 
   /**
    * Creates a tx to deploy a new instance of this contract using the specified public key to derive the address.
    */
-  public static deployWithPublicKey(publicKey: PublicKey, wallet: Wallet, storage_contract: AztecAddressLike) {
+  public static deployWithPublicKey(publicKey: PublicKey, wallet: Wallet, ) {
     return new DeployMethod<LogicContractContract>(publicKey, wallet, LogicContractContractArtifact, LogicContractContract.at, Array.from(arguments).slice(2));
   }
   
@@ -82,16 +82,13 @@ export class LogicContractContract extends ContractBase {
   /** Type-safe wrappers for the public methods exposed by the contract. */
   public methods!: {
     
-    /** set_address(address: struct) */
-    set_address: ((address: AztecAddressLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
-
-    /** increment_public_counter(old_count: integer, new_count: integer) */
-    increment_public_counter: ((old_count: (bigint | number), new_count: (bigint | number)) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
-
-    /** increment_counter(old_count: field, new_count: field) */
-    increment_counter: ((old_count: FieldLike, new_count: FieldLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
-
     /** compute_note_hash_and_nullifier(contract_address: struct, nonce: field, storage_slot: field, serialized_note: array) */
     compute_note_hash_and_nullifier: ((contract_address: AztecAddressLike, nonce: FieldLike, storage_slot: FieldLike, serialized_note: FieldLike[]) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
+    /** increment_counter(old_count: field) */
+    increment_counter: ((old_count: FieldLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
+    /** increment_public_counter(old_count: integer) */
+    increment_public_counter: ((old_count: (bigint | number)) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
   };
 }

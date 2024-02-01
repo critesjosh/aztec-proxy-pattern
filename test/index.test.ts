@@ -1,9 +1,9 @@
 import { SlowTreeContractArtifact, SlowTreeContract } from "../contracts/artifacts/SlowTree.js"
 import { ContractDeployer, Fr, Note, PXE, waitForPXE, TxStatus, createPXEClient, getContractDeploymentInfo, AccountWalletWithPrivateKey, AztecAddress, ExtendedNote } from "@aztec/aztec.js";
 import { getInitialTestAccountsWallets } from "@aztec/accounts/testing"
-import { StorageContractContract } from "../contracts/artifacts/StorageContract.js";
 import { LogicContractContract } from "../contracts/artifacts/LogicContract.js";
 import { ProxyContract } from "../contracts/artifacts/Proxy.js";
+
 
 const setupSandbox = async () => {
     const { PXE_URL = 'http://localhost:8080' } = process.env;
@@ -18,7 +18,7 @@ describe("Voting", () => {
     let wallets: AccountWalletWithPrivateKey[]
     let slowUpdatesAddress: AztecAddress
     let proxyContract: ProxyContract
-    let storageContract: StorageContractContract
+    let logicContract: LogicContractContract
 
     beforeAll(async () => {
         pxe = await setupSandbox();
@@ -48,30 +48,18 @@ describe("Voting", () => {
     })
 
     it("deploys other contracts", async () => {
-        let tx = await StorageContractContract.deploy(sender).send()
-        storageContract = await tx.deployed();
 
-        // FieldNote does not support broadcast, so has to added to PXE manually
-        let note = new Note([new Fr(0)])
-        let storageSlot = new Fr(3)
-        let extendedNote = new ExtendedNote(note,
-            sender.getAddress(),
-            storageContract.address,
-            storageSlot,
-            await tx.getTxHash())
-
-        pxe.addNote(extendedNote)
-
-        const logicContract = await LogicContractContract.deploy(sender, storageContract.address).send().deployed()
-        proxyContract = await ProxyContract.deploy(sender, sender.getAddress(), slowUpdatesAddress).send().deployed()
+        logicContract = await LogicContractContract.deploy(sender).send().deployed()
+        proxyContract = await ProxyContract.deploy(sender, sender.getAddress(), slowUpdatesAddress, logicContract.address).send().deployed()
         console.log("contracts deployed")
     })
 
     it("can call the counter function through the proxy", async () => {
-        let old_count = await storageContract.methods.get_counter().view()
 
-        console.log("old count", old_count)
-        // proxyContract.methods.call_counter(old_count)
+
+        await proxyContract.methods.init_slow_tree(logicContract.address)
+
+
     })
 
     // it("It casts a vote", async () => {

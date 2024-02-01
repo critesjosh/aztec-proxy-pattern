@@ -58,14 +58,14 @@ export class ProxyContract extends ContractBase {
   /**
    * Creates a tx to deploy a new instance of this contract.
    */
-  public static deploy(wallet: Wallet, admin: AztecAddressLike, slow_updates_contract: AztecAddressLike) {
+  public static deploy(wallet: Wallet, admin: AztecAddressLike, slow_updates_contract: AztecAddressLike, logic_contract: AztecAddressLike) {
     return new DeployMethod<ProxyContract>(Point.ZERO, wallet, ProxyContractArtifact, ProxyContract.at, Array.from(arguments).slice(1));
   }
 
   /**
    * Creates a tx to deploy a new instance of this contract using the specified public key to derive the address.
    */
-  public static deployWithPublicKey(publicKey: PublicKey, wallet: Wallet, admin: AztecAddressLike, slow_updates_contract: AztecAddressLike) {
+  public static deployWithPublicKey(publicKey: PublicKey, wallet: Wallet, admin: AztecAddressLike, slow_updates_contract: AztecAddressLike, logic_contract: AztecAddressLike) {
     return new DeployMethod<ProxyContract>(publicKey, wallet, ProxyContractArtifact, ProxyContract.at, Array.from(arguments).slice(2));
   }
   
@@ -82,16 +82,19 @@ export class ProxyContract extends ContractBase {
   /** Type-safe wrappers for the public methods exposed by the contract. */
   public methods!: {
     
-    /** get_slow_update() */
-    get_slow_update: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
-
-    /** call_counter(old_count: field, new_count: field) */
-    call_counter: ((old_count: FieldLike, new_count: FieldLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
-
     /** compute_note_hash_and_nullifier(contract_address: struct, nonce: field, storage_slot: field, serialized_note: array) */
     compute_note_hash_and_nullifier: ((contract_address: AztecAddressLike, nonce: FieldLike, storage_slot: FieldLike, serialized_note: FieldLike[]) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
 
-    /** call_public_counter(old_count: integer, new_count: integer) */
-    call_public_counter: ((old_count: (bigint | number), new_count: (bigint | number)) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+    /** get_slow_update() */
+    get_slow_update: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
+    /** call_counter() */
+    call_counter: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
+    /** call_public_counter() */
+    call_public_counter: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
+    /** init_slow_tree(logic_contract: struct) */
+    init_slow_tree: ((logic_contract: AztecAddressLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
   };
 }

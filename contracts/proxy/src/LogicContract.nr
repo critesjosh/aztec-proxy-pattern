@@ -20,18 +20,6 @@ impl LogicContractPrivateContextInterface {
       }
   }
   
-  pub fn increment_public_counter(
-    self,
-    context: &mut PrivateContext,
-    old_count: u120
-  ) {
-    let mut serialized_args = [0; 1];
-    serialized_args[0] = old_count as Field;
-
-    context.call_public_function(self.address, FunctionSelector::from_field(0x5b5c667e), serialized_args)
-  }
-  
-
   pub fn increment_counter(
     self,
     context: &mut PrivateContext,
@@ -41,6 +29,18 @@ impl LogicContractPrivateContextInterface {
     serialized_args[0] = old_count;
 
     context.call_private_function(self.address, FunctionSelector::from_field(0x3a268a16), serialized_args)
+  }
+  
+
+  pub fn increment_public_counter(
+    self,
+    context: &mut PrivateContext,
+    old_count: u120
+  ) {
+    let mut serialized_args = [0; 1];
+    serialized_args[0] = old_count as Field;
+
+    context.call_public_function(self.address, FunctionSelector::from_field(0x5b5c667e), serialized_args)
   }
   
 }

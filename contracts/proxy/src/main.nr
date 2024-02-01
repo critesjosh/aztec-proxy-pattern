@@ -64,10 +64,13 @@ contract Proxy {
             counter: Singleton::new(context, 3, FieldNoteMethods),
 	    } }
 	}
-    #[aztec(private)] // annotation to mark function as private and expose private context
-    fn constructor(admin: AztecAddress, slow_updates_contract: AztecAddress) { // called when contract is deployed
+    #[aztec(private)] 
+    fn constructor(admin: AztecAddress, slow_updates_contract: AztecAddress) {
         let mut slow_note = FieldNote::new(slow_updates_contract.to_field());
         storage.slow_update.initialize(&mut slow_note, false);
+
+        // let slow = SlowMap::at(slow_updates_contract);
+        // slow.update_at_private(&mut context, 0, logic_contract.to_field());
 
         context.call_public_function(
             context.this_address(),
@@ -76,8 +79,8 @@ contract Proxy {
         );
     }
 
-    #[aztec(public)] // annotation to mark function as public and expose public context
-    internal fn _initialize(admin: AztecAddress, slow_updates_contract: AztecAddress) { // internal - can only be called by contract
+    #[aztec(public)]
+    internal fn _initialize(admin: AztecAddress, slow_updates_contract: AztecAddress) {
         assert(admin.to_field() != 0, "invalid admin");
         storage.admin.write(admin);
         storage.public_slow_update.write(slow_updates_contract);
@@ -85,10 +88,26 @@ contract Proxy {
     }
 
     #[aztec(private)]
+    fn init_slow_tree(logic_contract: AztecAddress) {
+        let slow = SlowMap::at(AztecAddress::from_field(storage.slow_update.get_note().value));
+        slow.update_at_private(&mut context, 0, logic_contract.to_field());
+        context.call_public_function(
+            context.this_address(),
+            FunctionSelector::from_signature("_init_slow_tree((Field))"),
+            [context.msg_sender().to_field()]
+        );
+    }
+
+    #[aztec(public)]
+    internal fn _init_slow_tree(caller: AztecAddress) {
+        assert(storage.admin.read().eq(caller), "caller is not admin");
+    }
+
+    #[aztec(private)]
     fn call_counter() {
         let slow = SlowMap::at(AztecAddress::from_field(storage.slow_update.get_note().value));
         let logic_contract = LogicContractPrivateContextInterface::at(AztecAddress::from_field(slow.read_at(&mut context, 0)));
-        // get old count from storage
+        let old_count = storage.counter.get_note(true).value;
         let new_count = logic_contract.increment_counter(&mut context, old_count)[0];
         storage.counter.replace(&mut FieldNote::new(new_count), true);
     }
@@ -97,9 +116,9 @@ contract Proxy {
     fn call_public_counter() {
         let slow = SlowMap::at(AztecAddress::from_field(storage.slow_update.get_note().value));
         let logic_contract = LogicContractPublicContextInterface::at(AztecAddress::from_field(slow.read_at_pub(context, 0)));
-        // get old count from storage
+        let old_count = storage.public_counter.read().value;
         let new_count = logic_contract.increment_public_counter(context, old_count)[0];
-        storage.public_counter.write(new_count);
+        storage.public_counter.write(SafeU120::new(new_count));
     }
 
     unconstrained fn get_slow_update() -> pub Field {
