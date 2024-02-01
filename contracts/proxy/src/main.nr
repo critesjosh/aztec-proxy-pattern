@@ -1,7 +1,10 @@
 mod interfaces;
 mod LogicContract;
+mod types;
 
 contract Proxy {
+    use dep::safe_math::SafeU120;
+
     use dep::aztec::{
         protocol_types::{
             abis::function_selector::FunctionSelector,
@@ -13,7 +16,7 @@ contract Proxy {
             utils as note_utils,
         },
         context::{PrivateContext, Context},
-        state_vars::{ map::Map, public_state::PublicState,immutable_singleton::ImmutableSingleton}, 
+        state_vars::{ map::Map, public_state::PublicState, immutable_singleton::ImmutableSingleton, singleton::Singleton}, 
         types::type_serialization::{ // serialization methods for using booleans and aztec addresses
             bool_serialization::{BoolSerializationMethods, BOOL_SERIALIZED_LEN},
             address_serialization::{AddressSerializationMethods, AZTEC_ADDRESS_SERIALIZED_LEN},
@@ -26,10 +29,15 @@ contract Proxy {
         LogicContractPrivateContextInterface,
         LogicContractPublicContextInterface
     };
+    use crate::types::{
+        safe_u120_serialization::{SafeU120SerializationMethods, SAFE_U120_SERIALIZED_LEN}
+    };
     struct Storage {
         admin: PublicState<AztecAddress, AZTEC_ADDRESS_SERIALIZED_LEN>, // admin can end vote
         slow_update: ImmutableSingleton<FieldNote, FIELD_NOTE_LEN>,
         public_slow_update: PublicState<AztecAddress, AZTEC_ADDRESS_SERIALIZED_LEN>,
+        public_counter: PublicState<SafeU120, SAFE_U120_SERIALIZED_LEN>,
+        counter: Singleton<FieldNote, FIELD_NOTE_LEN>,
     }
 
     impl Storage {
@@ -47,6 +55,13 @@ contract Proxy {
             3,
             AddressSerializationMethods,
         ),
+                    public_counter: PublicState::new(
+                context,
+                2,
+                SafeU120SerializationMethods,
+            ),
+            // can only be updated by the deployer as written
+            counter: Singleton::new(context, 3, FieldNoteMethods),
 	    } }
 	}
     #[aztec(private)] // annotation to mark function as private and expose private context
@@ -70,17 +85,21 @@ contract Proxy {
     }
 
     #[aztec(private)]
-    fn call_counter(old_count: Field, new_count: Field) {
+    fn call_counter() {
         let slow = SlowMap::at(AztecAddress::from_field(storage.slow_update.get_note().value));
         let logic_contract = LogicContractPrivateContextInterface::at(AztecAddress::from_field(slow.read_at(&mut context, 0)));
-        let _ = logic_contract.increment_counter(&mut context, old_count, new_count);
+        // get old count from storage
+        let new_count = logic_contract.increment_counter(&mut context, old_count)[0];
+        storage.counter.replace(&mut FieldNote::new(new_count), true);
     }
 
     #[aztec(public)]
-    fn call_public_counter(old_count: u120, new_count: u120) {
+    fn call_public_counter() {
         let slow = SlowMap::at(AztecAddress::from_field(storage.slow_update.get_note().value));
         let logic_contract = LogicContractPublicContextInterface::at(AztecAddress::from_field(slow.read_at_pub(context, 0)));
-        let _ = logic_contract.increment_public_counter(context, old_count, new_count);
+        // get old count from storage
+        let new_count = logic_contract.increment_public_counter(context, old_count)[0];
+        storage.public_counter.write(new_count);
     }
 
     unconstrained fn get_slow_update() -> pub Field {

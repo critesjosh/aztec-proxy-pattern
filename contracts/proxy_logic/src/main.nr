@@ -1,5 +1,3 @@
-mod StorageContract;
-
 contract LogicContract {
     use dep::aztec::{
         protocol_types::{
@@ -13,60 +11,26 @@ contract LogicContract {
         }
     };
 
-    use crate::StorageContract::{
-        StorageContractPublicContextInterface,
-        StorageContractPrivateContextInterface,
-        AddressUpdateAddressStruct
-    };
-
     struct Storage {
-        proxy_storage: PublicState<AztecAddress, AZTEC_ADDRESS_SERIALIZED_LEN>,
     }
 
     impl Storage {
         fn init(context: Context) -> Self {
             Storage {
-                proxy_storage: PublicState::new(context, 1, AddressSerializationMethods),
             }}
 	}
 
     #[aztec(private)] 
-    fn constructor(storage_contract: AztecAddress) {
-        assert(!storage_contract.is_zero(), "invalid storage contract address");
-        context.call_public_function(
-            context.this_address(),
-            FunctionSelector::from_signature("_initialize((Field))"),
-            [storage_contract.to_field()]
-        );
-    }
-
-    #[aztec(public)] 
-    internal fn _initialize(storage_contract: AztecAddress) {
-        storage.proxy_storage.write(storage_contract);
-    }
+    fn constructor() {}
 
     #[aztec(private)]
-    fn increment_counter(old_count: Field, new_count: Field) {
-        let storage_contract = StorageContractPrivateContextInterface::at(storage.proxy_storage.read());
-        assert(new_count == old_count + 1, "invalid old count");
-        let _ = storage_contract.update_counter(&mut context, old_count, new_count);
+    fn increment_counter(old_count: Field) -> Field {
+        old_count + 1
     }
 
     #[aztec(public)]
-    fn increment_public_counter(old_count: u120, new_count: u120) {
-        let storage_contract = StorageContractPublicContextInterface::at(storage.proxy_storage.read());
-        assert(new_count == old_count + 1, "invalid old count");
-        let _ = storage_contract.update_public_counter(context, old_count as Field, new_count as Field);
-    }
-
-    #[aztec(public)]
-    fn set_address(address: AztecAddress) {
-        let storage_contract = StorageContractPublicContextInterface::at(storage.proxy_storage.read());
-        let _ = storage_contract.update_address(
-            context,
-            AddressUpdateAddressStruct { inner: address.to_field() },
-            true
-        );
+    fn increment_public_counter(old_count: u120) -> u120 {
+        old_count + 1
     }
 
     // not used in this contract, all public state

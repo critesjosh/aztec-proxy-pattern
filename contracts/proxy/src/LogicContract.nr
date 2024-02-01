@@ -8,10 +8,6 @@ use dep::aztec::protocol_types::{
   constants::RETURN_VALUES_LENGTH,
 };
 
-struct AddressSetAddressStruct {
-  inner: Field,
-}
-
 // Interface for calling LogicContract functions from a private context
 struct LogicContractPrivateContextInterface {
   address: AztecAddress,
@@ -24,43 +20,27 @@ impl LogicContractPrivateContextInterface {
       }
   }
   
-  pub fn increment_counter(
-    self,
-    context: &mut PrivateContext,
-    old_count: Field,
-    new_count: Field
-  ) -> [Field; RETURN_VALUES_LENGTH] {
-    let mut serialized_args = [0; 2];
-    serialized_args[0] = old_count;
-    serialized_args[1] = new_count;
-
-    context.call_private_function(self.address, FunctionSelector::from_field(0xf9605626), serialized_args)
-  }
-  
-
   pub fn increment_public_counter(
     self,
     context: &mut PrivateContext,
-    old_count: u120,
-    new_count: u120
+    old_count: u120
   ) {
-    let mut serialized_args = [0; 2];
+    let mut serialized_args = [0; 1];
     serialized_args[0] = old_count as Field;
-    serialized_args[1] = new_count as Field;
 
-    context.call_public_function(self.address, FunctionSelector::from_field(0x5ee7304c), serialized_args)
+    context.call_public_function(self.address, FunctionSelector::from_field(0x5b5c667e), serialized_args)
   }
   
 
-  pub fn set_address(
+  pub fn increment_counter(
     self,
     context: &mut PrivateContext,
-    address: AddressSetAddressStruct
-  ) {
+    old_count: Field
+  ) -> [Field; RETURN_VALUES_LENGTH] {
     let mut serialized_args = [0; 1];
-    serialized_args[0] = address.inner;
+    serialized_args[0] = old_count;
 
-    context.call_public_function(self.address, FunctionSelector::from_field(0x49e025c2), serialized_args)
+    context.call_private_function(self.address, FunctionSelector::from_field(0x3a268a16), serialized_args)
   }
   
 }
@@ -80,26 +60,12 @@ impl LogicContractPublicContextInterface {
   pub fn increment_public_counter(
     self,
     context: PublicContext,
-    old_count: u120,
-    new_count: u120
-  ) -> [Field; RETURN_VALUES_LENGTH] {
-    let mut serialized_args = [0; 2];
-    serialized_args[0] = old_count as Field;
-    serialized_args[1] = new_count as Field;
-
-    context.call_public_function(self.address, FunctionSelector::from_field(0x5ee7304c), serialized_args)
-  }
-  
-
-  pub fn set_address(
-    self,
-    context: PublicContext,
-    address: AddressSetAddressStruct
+    old_count: u120
   ) -> [Field; RETURN_VALUES_LENGTH] {
     let mut serialized_args = [0; 1];
-    serialized_args[0] = address.inner;
+    serialized_args[0] = old_count as Field;
 
-    context.call_public_function(self.address, FunctionSelector::from_field(0x49e025c2), serialized_args)
+    context.call_public_function(self.address, FunctionSelector::from_field(0x5b5c667e), serialized_args)
   }
   
 }
