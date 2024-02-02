@@ -45,7 +45,7 @@ contract Proxy {
 	    Storage {
 		 admin: PublicState::new(
 		    context, 
-            1, // storage slot. this can be anything except 0. it is hashed, and hash on 0 = 0
+            1, 
             AddressSerializationMethods,
 		), 
         // logic contract address is stored at index 0 in the slow updates tree
@@ -55,22 +55,19 @@ contract Proxy {
             3,
             AddressSerializationMethods,
         ),
-                    public_counter: PublicState::new(
-                context,
-                2,
-                SafeU120SerializationMethods,
-            ),
-            // can only be updated by the deployer as written
-            counter: Singleton::new(context, 3, FieldNoteMethods),
-	    } }
+        public_counter: PublicState::new(
+            context,
+            4,
+            SafeU120SerializationMethods,
+        ),
+        // can only be updated by the deployer as written
+        counter: Singleton::new(context, 5, FieldNoteMethods),
+    } }
 	}
     #[aztec(private)] 
     fn constructor(admin: AztecAddress, slow_updates_contract: AztecAddress) {
         let mut slow_note = FieldNote::new(slow_updates_contract.to_field());
         storage.slow_update.initialize(&mut slow_note, false);
-
-        // let slow = SlowMap::at(slow_updates_contract);
-        // slow.update_at_private(&mut context, 0, logic_contract.to_field());
 
         context.call_public_function(
             context.this_address(),
@@ -121,15 +118,27 @@ contract Proxy {
         storage.public_counter.write(SafeU120::new(new_count));
     }
 
+    unconstrained fn get_admin() -> pub AztecAddress {
+        storage.admin.read()
+    }
+
+    unconstrained fn is_slow_tree_init() -> pub bool {
+        storage.slow_update.is_initialized()
+    }
+
     unconstrained fn get_slow_update() -> pub Field {
-        storage.slow_update.get_note().value
+        storage.slow_update.view_note().value
+    }
+
+    unconstrained fn get_count() -> pub Field {
+        storage.counter.view_note().value
     }
 
     unconstrained fn compute_note_hash_and_nullifier(
         contract_address: AztecAddress,
         nonce: Field,
         storage_slot: Field,
-        serialized_note: [Field; 0]
+        serialized_note: [Field; 1]
     ) -> pub [Field; 4] {
         let note_header = NoteHeader::new(contract_address, nonce, storage_slot);
         note_utils::compute_note_hash_and_nullifier(FieldNoteMethods, note_header, serialized_note)

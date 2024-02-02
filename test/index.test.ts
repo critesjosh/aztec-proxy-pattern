@@ -50,25 +50,28 @@ describe("Voting", () => {
     it("deploys other contracts", async () => {
 
         logicContract = await LogicContractContract.deploy(sender).send().deployed()
-        proxyContract = await ProxyContract.deploy(sender, sender.getAddress(), slowUpdatesAddress, logicContract.address).send().deployed()
+        let tx = await ProxyContract.deploy(sender, sender.getAddress(), slowUpdatesAddress).send()
+        proxyContract = await tx.deployed()
+
+        let note = new Note([slowUpdatesAddress.toField()])
+        let storageSlot = new Fr(2)
+        let extendedNote = new ExtendedNote(note,
+            sender.getAddress(),
+            proxyContract.address,
+            storageSlot,
+            await tx.getTxHash())
+
+        await pxe.addNote(extendedNote)
         console.log("contracts deployed")
     })
 
     it("can call the counter function through the proxy", async () => {
 
-
-        await proxyContract.methods.init_slow_tree(logicContract.address)
-
+        let slowUpdateInitReceipt = await proxyContract.methods.init_slow_tree(logicContract.address).send().wait()
+        let addReceipt = await proxyContract.methods.call_counter().send().wait()
+        let count = await proxyContract.methods.get_count().view()
+        console.log(count)
 
     })
-
-    // it("It casts a vote", async () => {
-    //     const candidate = new Fr(1)
-
-    //     const contract = await EasyPrivateVotingContract.deploy(wallets[0], sender.getCompleteAddress().address).send().deployed();
-    //     const tx = await contract.methods.cast_vote(candidate).send().wait();
-    //     let count = await contract.methods.get_vote(candidate).view();
-    //     expect(count).toBe(1n);
-    // })
 
 });

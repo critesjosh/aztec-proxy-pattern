@@ -82,13 +82,13 @@ export class LogicContractContract extends ContractBase {
   /** Type-safe wrappers for the public methods exposed by the contract. */
   public methods!: {
     
+    /** increment_public_counter(old_count: integer) */
+    increment_public_counter: ((old_count: (bigint | number)) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
     /** compute_note_hash_and_nullifier(contract_address: struct, nonce: field, storage_slot: field, serialized_note: array) */
     compute_note_hash_and_nullifier: ((contract_address: AztecAddressLike, nonce: FieldLike, storage_slot: FieldLike, serialized_note: FieldLike[]) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
 
     /** increment_counter(old_count: field) */
     increment_counter: ((old_count: FieldLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
-
-    /** increment_public_counter(old_count: integer) */
-    increment_public_counter: ((old_count: (bigint | number)) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
   };
 }
