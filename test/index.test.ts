@@ -1,5 +1,5 @@
 import { SlowTreeContractArtifact, SlowTreeContract } from "../contracts/artifacts/SlowTree.js"
-import { ContractDeployer, Fr, Note, PXE, waitForPXE, TxStatus, createPXEClient, getContractDeploymentInfo, AccountWalletWithPrivateKey, AztecAddress, ExtendedNote } from "@aztec/aztec.js";
+import { ContractDeployer, Fr, Note, PXE, waitForPXE, TxStatus, createPXEClient, getContractInstanceFromDeployParams, AccountWalletWithPrivateKey, AztecAddress, ExtendedNote } from "@aztec/aztec.js";
 import { getInitialTestAccountsWallets } from "@aztec/accounts/testing"
 import { LogicContractContract } from "../contracts/artifacts/LogicContract.js";
 import { ProxyContract } from "../contracts/artifacts/Proxy.js";
@@ -32,11 +32,11 @@ describe("Voting", () => {
         const publicKey = sender.getCompleteAddress().publicKey
         // const deployArgs = sender.getCompleteAddress().address
 
-        const deploymentData = getContractDeploymentInfo(SlowTreeContractArtifact, [], salt, publicKey);
+        const deploymentData = getContractInstanceFromDeployParams(SlowTreeContractArtifact, [], salt, publicKey);
         const deployer = new ContractDeployer(SlowTreeContractArtifact, pxe, publicKey);
         const tx = deployer.deploy().send({ contractAddressSalt: salt })
         const receiptAfterMined = await tx.wait();
-        slowUpdatesAddress = deploymentData.completeAddress.address
+        slowUpdatesAddress = deploymentData.address
         console.log("Slow tree deployed")
         // expect(receiptAfterMined).toEqual(
         //     expect.objectContaining({
@@ -54,11 +54,13 @@ describe("Voting", () => {
         proxyContract = await tx.deployed()
 
         let note = new Note([slowUpdatesAddress.toField()])
+        note
         let storageSlot = new Fr(2)
         let extendedNote = new ExtendedNote(note,
             sender.getAddress(),
             proxyContract.address,
             storageSlot,
+            noteTypeId,
             await tx.getTxHash())
 
         await pxe.addNote(extendedNote)
