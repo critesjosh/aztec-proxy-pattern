@@ -6,9 +6,9 @@ contract LogicContract {
         },
         context::{PrivateContext, Context},
         state_vars::{  public_state::PublicState,}, 
-        types::type_serialization::{ // serialization methods for using booleans and aztec addresses
-            address_serialization::{AddressSerializationMethods, AZTEC_ADDRESS_SERIALIZED_LEN},
-        }
+        // types::type_serialization::{ // serialization methods for using booleans and aztec addresses
+        //     address_serialization::{AddressSerializationMethods, AZTEC_ADDRESS_SERIALIZED_LEN},
+        // }
     };
 
     struct Storage {
@@ -38,6 +38,7 @@ contract LogicContract {
         contract_address: AztecAddress,
         nonce: Field,
         storage_slot: Field,
+        note_type_id: Field,
         serialized_note: [Field; 0]
     ) -> pub [Field; 4] {
         [0, 0, 0, 0]

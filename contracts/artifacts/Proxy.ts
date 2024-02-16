@@ -10,6 +10,7 @@ import {
   ContractArtifact,
   ContractBase,
   ContractFunctionInteraction,
+  ContractInstanceWithAddress,
   ContractMethod,
   DeployMethod,
   EthAddress,
@@ -22,6 +23,7 @@ import {
   Point,
   PublicKey,
   Wallet,
+  WrappedFieldLike,
 } from '@aztec/aztec.js';
 import ProxyContractArtifactJson from '../proxy/target/proxy-Proxy.json' assert { type: 'json' };
 export const ProxyContractArtifact = loadContractArtifact(ProxyContractArtifactJson as NoirCompiledContract);
@@ -32,11 +34,10 @@ export const ProxyContractArtifact = loadContractArtifact(ProxyContractArtifactJ
 export class ProxyContract extends ContractBase {
   
   private constructor(
-    completeAddress: CompleteAddress,
+    instance: ContractInstanceWithAddress,
     wallet: Wallet,
-    portalContract = EthAddress.ZERO
   ) {
-    super(completeAddress, ProxyContractArtifact, wallet, portalContract);
+    super(instance, ProxyContractArtifact, wallet);
   }
   
 
@@ -82,28 +83,31 @@ export class ProxyContract extends ContractBase {
   /** Type-safe wrappers for the public methods exposed by the contract. */
   public methods!: {
     
-    /** is_slow_tree_init() */
-    is_slow_tree_init: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
-
-    /** compute_note_hash_and_nullifier(contract_address: struct, nonce: field, storage_slot: field, serialized_note: array) */
-    compute_note_hash_and_nullifier: ((contract_address: AztecAddressLike, nonce: FieldLike, storage_slot: FieldLike, serialized_note: FieldLike[]) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
-
-    /** get_admin() */
-    get_admin: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
-
-    /** call_counter() */
-    call_counter: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
-
     /** init_slow_tree(logic_contract: struct) */
     init_slow_tree: ((logic_contract: AztecAddressLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
 
-    /** call_public_counter() */
-    call_public_counter: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+    /** get_slow_update() */
+    get_slow_update: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
 
     /** get_count() */
     get_count: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
 
-    /** get_slow_update() */
-    get_slow_update: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+    /** call_counter() */
+    call_counter: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
+    /** call_public_counter() */
+    call_public_counter: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
+    /** compute_note_hash_and_nullifier(contract_address: struct, nonce: field, storage_slot: field, note_type_id: field, serialized_note: array) */
+    compute_note_hash_and_nullifier: ((contract_address: AztecAddressLike, nonce: FieldLike, storage_slot: FieldLike, note_type_id: FieldLike, serialized_note: FieldLike[]) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
+    /** constructor(admin: struct, slow_updates_contract: struct) */
+    constructor: ((admin: AztecAddressLike, slow_updates_contract: AztecAddressLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
+    /** is_slow_tree_init() */
+    is_slow_tree_init: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
+    /** get_admin() */
+    get_admin: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
   };
 }

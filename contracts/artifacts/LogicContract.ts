@@ -10,6 +10,7 @@ import {
   ContractArtifact,
   ContractBase,
   ContractFunctionInteraction,
+  ContractInstanceWithAddress,
   ContractMethod,
   DeployMethod,
   EthAddress,
@@ -22,6 +23,7 @@ import {
   Point,
   PublicKey,
   Wallet,
+  WrappedFieldLike,
 } from '@aztec/aztec.js';
 import LogicContractContractArtifactJson from '../proxy_logic/target/proxy_logic-LogicContract.json' assert { type: 'json' };
 export const LogicContractContractArtifact = loadContractArtifact(LogicContractContractArtifactJson as NoirCompiledContract);
@@ -32,11 +34,10 @@ export const LogicContractContractArtifact = loadContractArtifact(LogicContractC
 export class LogicContractContract extends ContractBase {
   
   private constructor(
-    completeAddress: CompleteAddress,
+    instance: ContractInstanceWithAddress,
     wallet: Wallet,
-    portalContract = EthAddress.ZERO
   ) {
-    super(completeAddress, LogicContractContractArtifact, wallet, portalContract);
+    super(instance, LogicContractContractArtifact, wallet);
   }
   
 
@@ -82,13 +83,16 @@ export class LogicContractContract extends ContractBase {
   /** Type-safe wrappers for the public methods exposed by the contract. */
   public methods!: {
     
+    /** increment_counter(old_count: field) */
+    increment_counter: ((old_count: FieldLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
     /** increment_public_counter(old_count: integer) */
     increment_public_counter: ((old_count: (bigint | number)) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
 
-    /** compute_note_hash_and_nullifier(contract_address: struct, nonce: field, storage_slot: field, serialized_note: array) */
-    compute_note_hash_and_nullifier: ((contract_address: AztecAddressLike, nonce: FieldLike, storage_slot: FieldLike, serialized_note: FieldLike[]) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+    /** constructor() */
+    constructor: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
 
-    /** increment_counter(old_count: field) */
-    increment_counter: ((old_count: FieldLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+    /** compute_note_hash_and_nullifier(contract_address: struct, nonce: field, storage_slot: field, note_type_id: field, serialized_note: array) */
+    compute_note_hash_and_nullifier: ((contract_address: AztecAddressLike, nonce: FieldLike, storage_slot: FieldLike, note_type_id: FieldLike, serialized_note: FieldLike[]) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
   };
 }

@@ -6,30 +6,19 @@ mod types;
 // https://github.com/AztecProtocol/aztec-packages/issues/1291
 // This is made as a separate contract for one thing mainly. Making it simpler to use.
 contract SlowTree {
-    use dep::aztec::protocol_types::{
-        abis::function_selector::FunctionSelector,
-        address::AztecAddress,
-    };
+    use dep::aztec::protocol_types::{abis::function_selector::FunctionSelector, address::AztecAddress};
     use dep::std::option::Option;
     use dep::value_note::{
-        balance_utils,
-        utils::{increment, decrement},
-        value_note::{VALUE_NOTE_LEN, ValueNote, ValueNoteMethods},
+        balance_utils, utils::{increment, decrement},
+        value_note::{VALUE_NOTE_LEN, ValueNote}
     };
     use dep::aztec::{
         context::{PrivateContext, PublicContext, Context},
-        note::{
-            note_header::NoteHeader,
-            utils as note_utils,
-        },
+        note::{note_header::NoteHeader, utils as note_utils},
         state_vars::{map::Map, public_state::PublicState, set::Set},
-        types::type_serialization::field_serialization::{
-            FieldSerializationMethods, FIELD_SERIALIZED_LEN,
-        },
+        // types::type_serialization::field_serialization::{FieldSerializationMethods, FIELD_SERIALIZED_LEN}
     };
-    use dep::slow_updates_tree::slow_map::{
-        SlowMap, Leaf, SlowUpdateProof, compute_merkle_root, deserialize_slow_update_proof
-    };
+    use dep::slow_updates_tree::slow_map::{SlowMap, Leaf, SlowUpdateProof, compute_merkle_root, deserialize_slow_update_proof};
 
     // docs:start:import_pop_capsule
     use crate::capsule::pop_capsule;
@@ -47,23 +36,6 @@ contract SlowTree {
         trees: Map<Field, SlowMap<TREE_HEIGHT, UPDATE_SIZE>>,
     }
     // docs:end:constants_and_storage
-
-    impl Storage {
-        fn init(context: Context) -> Self {
-            Storage {
-                trees: Map::new(
-                    context,
-                    1,
-                    |context, slot| {
-                        SlowMap::new(
-                            context,
-                            slot,
-                        )
-                    }
-                ),
-            }
-        }
-    }
 
     #[aztec(private)]
     fn constructor() {}
@@ -176,6 +148,7 @@ contract SlowTree {
         _contract_address: AztecAddress,
         _nonce: Field,
         _storage_slot: Field,
+        note_type_id: Field,
         _serialized_note: [Field; 4]
     ) -> pub [Field; 4] {
         [0x0d, 0x0e, 0x0a, 0x0d]

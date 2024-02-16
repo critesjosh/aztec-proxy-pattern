@@ -10,6 +10,7 @@ import {
   ContractArtifact,
   ContractBase,
   ContractFunctionInteraction,
+  ContractInstanceWithAddress,
   ContractMethod,
   DeployMethod,
   EthAddress,
@@ -22,6 +23,7 @@ import {
   Point,
   PublicKey,
   Wallet,
+  WrappedFieldLike,
 } from '@aztec/aztec.js';
 import SlowTreeContractArtifactJson from '../slow_tree/target/slow_tree_contract-SlowTree.json' assert { type: 'json' };
 export const SlowTreeContractArtifact = loadContractArtifact(SlowTreeContractArtifactJson as NoirCompiledContract);
@@ -32,11 +34,10 @@ export const SlowTreeContractArtifact = loadContractArtifact(SlowTreeContractArt
 export class SlowTreeContract extends ContractBase {
   
   private constructor(
-    completeAddress: CompleteAddress,
+    instance: ContractInstanceWithAddress,
     wallet: Wallet,
-    portalContract = EthAddress.ZERO
   ) {
-    super(completeAddress, SlowTreeContractArtifact, wallet, portalContract);
+    super(instance, SlowTreeContractArtifact, wallet);
   }
   
 
@@ -82,29 +83,32 @@ export class SlowTreeContract extends ContractBase {
   /** Type-safe wrappers for the public methods exposed by the contract. */
   public methods!: {
     
+    /** read_at_pub(key: field) */
+    read_at_pub: ((key: FieldLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
+    /** compute_note_hash_and_nullifier(_contract_address: struct, _nonce: field, _storage_slot: field, note_type_id: field, _serialized_note: array) */
+    compute_note_hash_and_nullifier: ((_contract_address: AztecAddressLike, _nonce: FieldLike, _storage_slot: FieldLike, note_type_id: FieldLike, _serialized_note: FieldLike[]) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
     /** un_read_leaf_at(address: struct, key: field) */
     un_read_leaf_at: ((address: AztecAddressLike, key: FieldLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
-
-    /** un_read_root(address: struct) */
-    un_read_root: ((address: AztecAddressLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
-
-    /** compute_note_hash_and_nullifier(_contract_address: struct, _nonce: field, _storage_slot: field, _serialized_note: array) */
-    compute_note_hash_and_nullifier: ((_contract_address: AztecAddressLike, _nonce: FieldLike, _storage_slot: FieldLike, _serialized_note: FieldLike[]) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
-
-    /** read_leaf_at_pub(key: field) */
-    read_leaf_at_pub: ((key: FieldLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
-
-    /** update_at_public(p: struct) */
-    update_at_public: ((p: { index: FieldLike, new_value: FieldLike, before: { value: FieldLike, sibling_path: FieldLike[] }, after: { value: FieldLike, sibling_path: FieldLike[] } }) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
 
     /** read_at(index: field) */
     read_at: ((index: FieldLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
 
-    /** read_at_pub(key: field) */
-    read_at_pub: ((key: FieldLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+    /** read_leaf_at_pub(key: field) */
+    read_leaf_at_pub: ((key: FieldLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
+    /** un_read_root(address: struct) */
+    un_read_root: ((address: AztecAddressLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
+    /** constructor() */
+    constructor: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
 
     /** update_at_private(index: field, new_value: field) */
     update_at_private: ((index: FieldLike, new_value: FieldLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
+
+    /** update_at_public(p: struct) */
+    update_at_public: ((p: { index: FieldLike, new_value: FieldLike, before: { value: FieldLike, sibling_path: FieldLike[] }, after: { value: FieldLike, sibling_path: FieldLike[] } }) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
 
     /** initialize() */
     initialize: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
