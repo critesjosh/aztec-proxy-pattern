@@ -54,7 +54,8 @@ describe("Voting", () => {
         proxyContract = await tx.deployed()
 
         let note = new Note([slowUpdatesAddress.toField()])
-        note
+        // from here: https://github.com/AztecProtocol/aztec-packages/blob/e6d65a7fe9ebe855dcac389775aae2ccc3fa311f/noir-projects/aztec-nr/field-note/src/field_note.nr#L57
+        const noteTypeId = new Fr(7010510110810078111116101);
         let storageSlot = new Fr(2)
         let extendedNote = new ExtendedNote(note,
             sender.getAddress(),
